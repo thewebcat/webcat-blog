@@ -23,4 +23,8 @@ SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 SQLALCHEMY_DATABASE_URI = 'postgresql://%(user)s:\
     %(pw)s@%(host)s:%(port)s/%(db)s' % POSTGRES
-SQLALCHEMY_MIGRATE_REPO = os.path.join(basedir, 'db_repository')
+
+try:
+    from local_settings import *
+except ImportError:
+    pass
