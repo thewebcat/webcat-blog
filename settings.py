@@ -1,6 +1,8 @@
 import os
 basedir = os.path.abspath(os.path.dirname(__file__))
 
+DEBUG = True
+
 CSRF_ENABLED = True
 SECRET_KEY = '@$#@RRer23$@#$RWEr_)('
 
@@ -19,10 +21,10 @@ POSTGRES = {
     'host': 'localhost',
     'port': '5432',
 }
+
 SQLALCHEMY_TRACK_MODIFICATIONS = False
 
-SQLALCHEMY_DATABASE_URI = 'postgresql://%(user)s:\
-    %(pw)s@%(host)s:%(port)s/%(db)s' % POSTGRES
+SQLALCHEMY_DATABASE_URI = 'postgresql://{user}:{pw}@{host}:{port}/{db}'.format(**POSTGRES)
 
 try:
     from local_settings import *
