@@ -5,23 +5,32 @@ from flask.ext.login import LoginManager
 from flask.ext.bootstrap import Bootstrap
 from flask.ext.debugtoolbar import DebugToolbarExtension
 from flask.ext.moment import Moment
+from flask.ext.mail import Mail
 
-app = Flask(__name__)
-app.config.from_object('settings')
+from settings import config
 
-app.debug = app.config['DEBUG']
+db = SQLAlchemy()
+mail = Mail()
+bootstrap = Bootstrap()
+moment = Moment()
+toolbar = DebugToolbarExtension()
 
-db = SQLAlchemy(app)
-migrate = Migrate(app, db)
+login_manager = LoginManager()
+login_manager.login_view = 'main.login'
 
-lm = LoginManager()
-lm.init_app(app)
-lm.login_view = 'login'
+def create_app(config_name):
+    app = Flask(__name__)
+    app.config.from_object(config[config_name])
+    config[config_name].init_app(app)
 
-bootstrap = Bootstrap(app)
+    #app.debug = app.config['DEBUG']
+    db.init_app(app)
+    login_manager.init_app(app)
+    bootstrap.init_app(app)
+    mail.init_app(app)
+    moment.init_app(app)
 
-moment = Moment(app)
+    from .main import main as main_blueprint
+    app.register_blueprint(main_blueprint)
 
-toolbar = DebugToolbarExtension(app)
-
-from app import views, models
+    return app

@@ -1,26 +1,33 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
 
-from app import app, db, models, lm
-from flask import render_template, flash, redirect, url_for, g, session, request
+from flask import render_template, flash, redirect, url_for, g, request, abort
 from flask_login import current_user, login_required, login_user, logout_user
 
-from app.forms import LoginForm, RegisterForm
-from app.models import User
+from app import db, login_manager
+from . import main
+from .forms import LoginForm, RegisterForm
+from ..models import User
 
 
-@lm.user_loader
+@login_manager.user_loader
 def load_user(id):
-    return User.query.get(int(id))
+    try:
+        return User.query.get(int(id))
+    except:
+        pass
+        #logout_user()
+        #flash('You account has been deleted', 'error')
+        #return redirect(url_for('main.login'))
 
 
-@app.before_request
+@main.before_request
 def before_request():
     g.user = current_user
 
 
-@app.route('/')
-@app.route('/index')
+@main.route('/')
+@main.route('/index')
 @login_required
 def index():
     user = g.user
@@ -41,7 +48,7 @@ def index():
     })
 
 
-@app.route('/registration', methods=['GET', 'POST'])
+@main.route('/registration', methods=['GET', 'POST'])
 def register():
     form = RegisterForm()
     if form.validate_on_submit():
@@ -61,7 +68,7 @@ def register():
     })
 
 
-@app.route('/login', methods=['GET', 'POST'])
+@main.route('/login', methods=['GET', 'POST'])
 def login():
     if g.user is not None and g.user.is_authenticated:
         return redirect(url_for('index'))
@@ -80,18 +87,17 @@ def login():
 
     return render_template('login.html', **{
         'title': 'Sing In',
-        'form': form,
-        'providers': app.config['OPENID_PROVIDERS']
+        'form': form
     })
 
 
-@app.route('/logout')
+@main.route('/logout')
 def logout():
     logout_user()
     return redirect(url_for('index'))
 
 
-@app.route('/user/<nickname>')
+@main.route('/user/<nickname>')
 @login_required
 def user(nickname):
     user = User.query.filter_by(nickname=nickname).first()
@@ -106,12 +112,3 @@ def user(nickname):
                            user=user,
                            posts=posts)
 
-
-@app.errorhandler(404)
-def page_not_found(e):
-    return render_template('404.html'), 404
-
-
-@app.errorhandler(500)
-def internal_server_error(e):
-    return render_template('500.html'), 500
