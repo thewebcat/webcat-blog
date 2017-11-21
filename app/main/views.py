@@ -1,16 +1,13 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
 
-from flask import render_template, flash, redirect, url_for, g, request, abort
-from flask_login import current_user, login_required, login_user, logout_user
+from flask import render_template, flash, redirect, url_for, g
+from flask_login import login_required
 
-from app import db, login_manager
+from app import db
+from app.auth.forms import RegisterForm
 from . import main
-from .forms import LoginForm, RegisterForm
 from ..models import User
-
-
-
 
 
 @main.route('/')

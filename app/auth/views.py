@@ -2,20 +2,14 @@ from flask import g, redirect, url_for, request, flash, render_template
 from flask_login import login_user, logout_user, current_user
 
 from app import login_manager
-from app.main.forms import LoginForm
+from app.auth.forms import LoginForm
 from app.models import User
 from . import auth
 
 
 @login_manager.user_loader
-def load_user(id):
-    try:
-        return User.query.get(int(id))
-    except:
-        pass
-        #logout_user()
-        #flash('You account has been deleted', 'error')
-        #return redirect(url_for('main.login'))
+def load_user(user_id):
+    return User.query.get(int(user_id))
 
 
 @auth.before_request
@@ -40,7 +34,7 @@ def login():
         flash('Logged in successfully')
         return redirect(request.args.get('next') or url_for('index'))
 
-    return render_template('login.html', **{
+    return render_template('auth/login.html', **{
         'title': 'Sing In',
         'form': form
     })

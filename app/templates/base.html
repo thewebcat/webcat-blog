@@ -38,7 +38,7 @@
 
       <div class="collapse navbar-collapse" id="navbarsExampleDefault">
         <ul class="navbar-nav mr-auto">
-          {% if not g.user.is_authenticated %}
+          {% if not current_user.is_authenticated %}
           <li class="nav-item active">
             <a class="nav-link" href="/login">login <span class="sr-only">(current)</span></a>
           </li>
@@ -46,7 +46,7 @@
             <a class="nav-link" href="/registration">Registration</a>
           </li>
           {% endif %}
-          {% if g.user.is_authenticated %}
+          {% if current_user.is_authenticated %}
           <li class="nav-item">
             <a class="nav-link" href="/logout">Logout</a>
           </li>
